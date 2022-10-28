@@ -14,7 +14,7 @@ from .conf import settings
 # Create your models here.
 
 
-class User(models.Model):
+class User(models.Model):  # extended user model
 	user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, blank=True, null=True)
 	main_contact = models.CharField(max_length=12, null=True, blank=True)
 	otp = models.CharField(max_length=4, null=True, blank=True)
@@ -64,11 +64,6 @@ class ArkeselSMSDevice(ThrottlingMixin, SideChannelDevice):
 
 		if settings.OTP_ARKESEL_NO_DELIVERY:
 			logging.info(message)
-			logging.info(f'''Format: {
-				"sender": settings.OTP_ARKESEL_FROM,
-				"message": "just another test, token: {message}",
-				"recipients": [str(self.number), ]
-			}''')
 		else:
 			self._deliver_token(message)
 
@@ -88,9 +83,9 @@ class ArkeselSMSDevice(ThrottlingMixin, SideChannelDevice):
 		if settings.OTP_ARKESEL_SANDBOX:
 			payload['sandbox'] = True
 
-		response = httpx.post(url, json=payload, headers={'API-KEY': settings.ARKESEL_API_KEY})
+		response = httpx.post(url, json=payload, headers={'API-KEY': settings.ARKESEL_API_KEY}, timeout=None)
 		logging.info(f'Response: {response.json()}\n')
-		logging.info(f'Message: {payload}\n')
+		logging.debug(f'Message: {payload}\n')
 		try:
 			response.raise_for_status()
 		except Exception as e:

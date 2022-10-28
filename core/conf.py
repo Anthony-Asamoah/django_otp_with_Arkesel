@@ -15,7 +15,7 @@ class Settings(object):
 
 		'ARKESEL_API_KEY': os.getenv("ARKESEL_API_KEY"),
 		'OTP_ARKESEL_FROM': "MyHealthCOP",
-		'OTP_ARKESEL_CHALLENGE_MESSAGE': "SMS sent",
+		'OTP_ARKESEL_CHALLENGE_MESSAGE': "SMS sent with token: {token}",
 		'OTP_ARKESEL_THROTTLE_FACTOR': 1,
 
 		'OTP_ARKESEL_SANDBOX': True,
