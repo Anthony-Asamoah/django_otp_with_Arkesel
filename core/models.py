@@ -18,7 +18,7 @@ class User(models.Model):
 	user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, blank=True, null=True)
 	main_contact = models.CharField(max_length=12, null=True, blank=True)
 	otp = models.CharField(max_length=4, null=True, blank=True)
-	# otp_isValid = models.BooleanField(default=False)
+	otp_isValid = models.BooleanField(default=False)
 	otp_stamp = models.CharField(max_length=50, blank=True, null=True)
 
 	def __str__(self):

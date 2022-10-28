@@ -45,11 +45,9 @@ def create_user(request):  # using manual method
 
 	# save token info to instance
 	device.otp = md5Token.hexdigest()
-	# device.otp_isValid = True
-	try:
-		device.save()
-	except Exception as e:
-		logging.warning(f'Error while saving token: {e}')
+	device.otp_isValid = True
+	device.save()
+
 	return JsonResponse(
 		{
 			'message': 'Index Works',
@@ -108,17 +106,17 @@ def verify_otp(request):
 
 	if request.method == 'POST':
 		code = request.POST['otp']
-		# key = request.POST['key']
 
 		# get user instance
 		device = Ext_user.objects.get(user=user.id)
 		logging.info(device)
 
-		# verify token
-		# device = TOTPVerification(key=key)
-		# isVerified = device.verify_token(code)
-
-		isVerified = (hashlib.md5(code.encode()).hexdigest() == device.otp)
+		isVerified = False
+		if device.otp_isValid:
+			isVerified: bool = (hashlib.md5(code.encode()).hexdigest() == device.otp)
+			if isVerified:
+				device.otp_isValid = False
+				device.save()
 
 		return JsonResponse(
 			{
@@ -133,83 +131,6 @@ def verify_otp(request):
 		raise BadRequest("Invalid Method 'GET'")
 
 
-# ###################################### Django_otp_abstracted method #########################################
-#
-# def create_user(request):
-# 	jwt_object = JWTAuthentication()
-#
-# 	header = jwt_object.get_header(request)
-# 	raw_token = jwt_object.get_raw_token(header)
-# 	validated_token = jwt_object.get_validated_token(raw_token)
-# 	user = jwt_object.get_user(validated_token)
-#
-# 	device = ArkeselSMSDevice(user=user, number="233503032976")
-# 	hasDevice = django_otp.user_has_device(user=user)
-#
-# 	return JsonResponse(
-# 		{
-# 			'message': 'Index Works',
-# 			'status': 'SUCCESS',
-# 			'detail': [{
-# 				'check': hasDevice if hasDevice else ArkeselSMSDevice.generate_challenge(device),
-# 				'interactive': device.is_interactive(),
-# 				'id': device.persistent_id
-# 			}]
-# 		}
-# 	)
-#
-#
-# def get_otp(request):
-# 	jwt_object = JWTAuthentication()
-#
-# 	header = jwt_object.get_header(request)
-# 	raw_token = jwt_object.get_raw_token(header)
-# 	validated_token = jwt_object.get_validated_token(raw_token)
-# 	user = jwt_object.get_user(validated_token)
-#
-# 	device = ArkeselSMSDevice(user=user, number="233503032976")
-#
-# 	return JsonResponse(
-# 		{
-# 			'message': 'Index Works',
-# 			'status': 'SUCCESS',
-# 			'detail': [{
-# 				# 'check': SideChannelDevice.generate_token(length=6, valid_secs=300, commit=True, self=device),
-# 				'check': device.generate_challenge()
-# 			}]
-# 		}
-# 	)
-#
-#
-# @csrf_exempt
-# def verify_otp(request):
-# 	jwt_object = JWTAuthentication()
-#
-# 	header = jwt_object.get_header(request)
-# 	raw_token = jwt_object.get_raw_token(header)
-# 	validated_token = jwt_object.get_validated_token(raw_token)
-# 	user = jwt_object.get_user(validated_token)
-#
-# 	if request.method == 'POST':
-# 		code = request.POST['otp']
-#
-# 		# device = Device(user=user)
-# 		# isValid = Device.verify_token(device, code)
-# 		matched = django_otp.match_token(token=code, user=user)
-#
-# 		with atomic():
-#
-# 			return JsonResponse(
-# 				{
-# 					'message': 'Index Works',
-# 					'status': 'SUCCESS',
-# 					'detail': [{
-# 						'valid': 'False' if matched is None else str(matched.verify_token(code))
-# 					}]
-# 				}
-# 			)
-# 	else:
-# 		raise BadRequest("Invalid Method 'GET'")
 ###################################################################################################
 
 class UserViewSet(viewsets.ModelViewSet):
