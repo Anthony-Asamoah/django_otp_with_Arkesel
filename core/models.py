@@ -64,6 +64,11 @@ class ArkeselSMSDevice(ThrottlingMixin, SideChannelDevice):
 
 		if settings.OTP_ARKESEL_NO_DELIVERY:
 			logging.info(message)
+			logging.info(f'''Format: {
+			"sender": settings.OTP_ARKESEL_FROM,
+							"message": "just another test, token: {message}",
+							"recipients": [str(self.number), ]
+						}''')
 		else:
 			self._deliver_token(message)
 
