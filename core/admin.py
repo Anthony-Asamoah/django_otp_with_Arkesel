@@ -10,8 +10,8 @@ from .models import ArkeselSMSDevice
 
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
-	list_display = ['user', 'main_contact', 'otp_isValid']
-	readonly_fields = ['otp', 'otp_timestamp', 'otp_isValid']
+	list_display = ['user', 'main_contact', 'otp_isValid', 'user_is_phone_verified']
+	readonly_fields = ['otp', 'otp_timestamp', 'otp_isValid', 'user_is_phone_verified']
 	list_display_links = list_display
 
 

@@ -18,6 +18,7 @@ from .conf import settings
 class User(models.Model):
 	user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, blank=True, null=True)
 	main_contact = models.CharField(max_length=12, null=True, blank=True)
+	user_is_phone_verified = models.BooleanField(default=False)
 	otp = models.CharField(max_length=4, null=True, blank=True)
 	otp_isValid = models.BooleanField(default=False)
 	otp_timestamp = models.FloatField(default=time.time())

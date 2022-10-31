@@ -15,6 +15,5 @@ urlpatterns = [
 	re_path(r'^auth/', include('djoser.urls.jwt')),
 
 	path('create-otp', views.create_user, name='create'),
-	path('get-otp', views.get_otp, name='get'),
 	path('verify-otp', views.verify_otp, name='verify'),
 ]
