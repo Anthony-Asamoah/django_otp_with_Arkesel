@@ -3,6 +3,7 @@ import logging
 import os
 import time
 
+import httpx
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import BadRequest
 from django.http import JsonResponse
@@ -43,9 +44,23 @@ def create_user(request):  # using manual method
 	device = Ext_user.objects.get(user=user.id)
 	logging.info(device)
 
+	# send otp via sms using Arkesel
+	response = httpx.post(
+		url=f'https://sms.arkesel.com/api/v2/sms/send/',
+		headers={'API-KEY': os.getenv('ARKESEL_API_KEY')},
+		json={
+			"sandbox": True,
+			"sender": "MyHealthCop",
+			"message": f"Your one time passcode is {token}",
+			"recipients": [device.main_contact, ]
+		})
+	logging.info(response.json())
+	sms_is_sent = response.is_success
+
 	# save token info to instance
 	device.otp = md5Token.hexdigest()
 	device.otp_isValid = True
+	device.otp_timestamp = time.time()
 	device.save()
 
 	return JsonResponse(
@@ -54,6 +69,7 @@ def create_user(request):  # using manual method
 			'status': 'SUCCESS',
 			'detail': [{
 				'otp': token,
+				'SMS Sent': sms_is_sent,
 			}]
 		}
 	)
@@ -112,7 +128,7 @@ def verify_otp(request):
 		logging.info(device)
 
 		isVerified = False
-		if device.otp_isValid:
+		if device.otp_isValid and time.time() - device.otp_timestamp < int(os.getenv("VALID_OTP_DURATION")):
 			isVerified: bool = (hashlib.md5(code.encode()).hexdigest() == device.otp)
 			if isVerified:
 				device.otp_isValid = False

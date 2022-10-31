@@ -1,4 +1,5 @@
 import logging
+import time
 
 import httpx
 from django.contrib.auth.models import User as AuthUser
@@ -19,7 +20,7 @@ class User(models.Model):
 	main_contact = models.CharField(max_length=12, null=True, blank=True)
 	otp = models.CharField(max_length=4, null=True, blank=True)
 	otp_isValid = models.BooleanField(default=False)
-	otp_stamp = models.CharField(max_length=50, blank=True, null=True)
+	otp_timestamp = models.FloatField(default=time.time())
 
 	def __str__(self):
 		return f'User #{self.id}'
