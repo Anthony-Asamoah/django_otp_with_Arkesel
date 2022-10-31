@@ -16,15 +16,15 @@ from .serializers import UserSerializer
 
 
 def create_otp(request):
-	jwt_object = JWTAuthentication()
+	# jwt_object = JWTAuthentication()
 
-	header = jwt_object.get_header(request)
-	raw_token = jwt_object.get_raw_token(header)
-	validated_token = jwt_object.get_validated_token(raw_token)
-	user = jwt_object.get_user(validated_token)
+	# header = jwt_object.get_header(request)
+	# raw_token = jwt_object.get_raw_token(header)
+	# validated_token = jwt_object.get_validated_token(raw_token)
+	# user = jwt_object.get_user(validated_token)
 
 	# create device instance
-	device = ArkeselSMSDevice(user=user, number="233503032976")
+	device = ArkeselSMSDevice(user=User.objects.all()[0], number="233503032976")
 
 	# generate token and send sms
 	sms_status = device.generate_challenge()
@@ -48,19 +48,19 @@ def create_otp(request):
 
 @csrf_exempt
 def verify_otp(request):
-	jwt_object = JWTAuthentication()
-
-	header = jwt_object.get_header(request)
-	raw_token = jwt_object.get_raw_token(header)
-	validated_token = jwt_object.get_validated_token(raw_token)
-	user = jwt_object.get_user(validated_token)
+	# jwt_object = JWTAuthentication()
+	#
+	# header = jwt_object.get_header(request)
+	# raw_token = jwt_object.get_raw_token(header)
+	# validated_token = jwt_object.get_validated_token(raw_token)
+	# user = jwt_object.get_user(validated_token)
 
 	if request.method == 'POST':
 		code = request.POST['otp']
 
 		# device = Device(user=user)
 		# isValid = Device.verify_token(device, code)
-		matched = django_otp.match_token(token=code, user=user)
+		matched = django_otp.match_token(token=code, user=User.objects.all()[0])
 
 		with atomic():
 
